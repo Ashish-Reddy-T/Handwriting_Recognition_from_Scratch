@@ -16,6 +16,11 @@ def get_mnist():
     """
     return images, labels
 
+# Function for introducing non-linearity
+def softmax(x):
+    exp_x = np.exp(x - np.max(x)) # Subtract max(x) for stability
+    return exp_x / np.sum(exp_x)
+
 # Weights !!
 w_i_h = np.random.uniform(-0.5, 0.5, (4, 784))  # 4 hidden nodes, 784 input nodes
 w_h_o = np.random.uniform(-0.5, 0.5, (10, 4))   # 10 output nodes (for digits 0-9), 4 hidden nodes
@@ -39,20 +44,25 @@ for epoch in range(epochs):
 
         # Forward propagation
         h_pre = b_i_h + w_i_h @ img
-        h = 1 / (1 + np.exp(-h_pre))
+        h = 1 / (1 + np.exp(-h_pre)) # Sigmoid activation in hidden layer
         
         o_pre = b_h_o + w_h_o @ h
-        o = 1 / (1 + np.exp(-o_pre))
+        ## o = 1 / (1 + np.exp(-o_pre))
+        o = softmax(o_pre)
 
-        # Cost calculation (remove indexing with [0])
-        e = 1 / len(o) * np.sum((o - l)**2)
-        nr_correct += int(np.argmax(o) == np.argmax(l))
+        ## # Cost calculation (remove indexing with [0])  [Mean Squared Error]
+        ## e = 1 / len(o) * np.sum((o - l)**2)
 
-        # Backpropagation
+        e = -np.sum(l*np.log(o + 1e-8)) # Cross Entropy Loss for better accuracy as compared with MSE
+
+        nr_correct += int(np.argmax(o) == np.argmax(l)) # Calculating accuracy
+
+        # Backpropagation (Output --> Hidden)
         delta_o = o - l
         w_h_o += -learn_rate * (delta_o @ np.transpose(h))
         b_h_o += -learn_rate * delta_o
 
+        # Backpropagation (Hidden --> Input)
         delta_h = np.transpose(w_h_o) @ delta_o * (h * (1 - h))
         w_i_h += -learn_rate * (delta_h @ np.transpose(img))
         b_i_h += -learn_rate * delta_h
@@ -81,9 +91,10 @@ while True:
         plt.imshow(img.reshape(28,28), cmap="Greys")
 
         h_pre = b_i_h + w_i_h @ img.reshape(784, 1)
-        h = 1 / (1 + np.exp(-h_pre))
+        h = 1 / (1 + np.exp(-h_pre)) # Hidden Layer with Sigmoid
         o_pre = b_h_o + w_h_o @ h
-        o = 1 / (1 + np.exp(-o_pre))
+        ## o = 1 / (1 + np.exp(-o_pre)) # Sigmoid Function for non-linearity
+        o = softmax(o_pre)
 
         plt.title(f"Predicted digit: {np.argmax(o)}")
         plt.draw()  # Draw the plot
