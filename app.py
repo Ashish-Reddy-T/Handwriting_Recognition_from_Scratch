@@ -30,7 +30,7 @@ images, labels = get_mnist()
 nr_correct = 0
 learn_rate = 0.01
 # Training Loop
-epochs = 10
+epochs = 5
 for epoch in range(epochs):
     for img, l in zip(images, labels):
         # Reshape input and labels
@@ -87,8 +87,7 @@ while True:
 
         plt.title(f"Predicted digit: {np.argmax(o)}")
         plt.draw()  # Draw the plot
-        plt.pause(3)  # Keep plot visible for 3 seconds
-        plt.close('all')  # Close all figures
+        plt.show(block=True)
         
     except ValueError:
         print("Please enter a valid number or 'q' to quit")
