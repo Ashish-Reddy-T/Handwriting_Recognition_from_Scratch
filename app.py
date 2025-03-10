@@ -21,13 +21,19 @@ def softmax(x):
     exp_x = np.exp(x - np.max(x)) # Subtract max(x) for stability
     return exp_x / np.sum(exp_x)
 
+hidden_neurons = 64
+
 # Weights !!
-w_i_h = np.random.uniform(-0.5, 0.5, (4, 784))  # 4 hidden nodes, 784 input nodes
-w_h_o = np.random.uniform(-0.5, 0.5, (10, 4))   # 10 output nodes (for digits 0-9), 4 hidden nodes
+## w_i_h = np.random.uniform(-0.5, 0.5, (4, 784))  # 4 hidden nodes, 784 input nodes
+## w_h_o = np.random.uniform(-0.5, 0.5, (10, 4))   # 10 output nodes (for digits 0-9), 4 hidden nodes
+w_i_h = np.random.uniform(-0.5, 0.5, (hidden_neurons, 784))  # 64 hidden nodes, 784 input nodes
+w_h_o = np.random.uniform(-0.5, 0.5, (10, hidden_neurons))   # 10 output nodes, 64 hidden nodes
 
 # Biases !!
-b_i_h = np.zeros((4, 1))   # Bias for hidden layer
-b_h_o = np.zeros((10, 1))  # Bias for output layer (10 nodes for digits 0-9)
+## b_i_h = np.zeros((4, 1))   # Bias for hidden layer
+## b_h_o = np.zeros((10, 1))  # Bias for output layer (10 nodes for digits 0-9)
+b_i_h = np.zeros((hidden_neurons, 1))   # Bias for hidden layer
+b_h_o = np.zeros((10, 1))  # Bias for output layer
 
 # Load Data
 images, labels = get_mnist()
@@ -35,7 +41,7 @@ images, labels = get_mnist()
 nr_correct = 0
 learn_rate = 0.01
 # Training Loop
-epochs = 5
+epochs = 3
 for epoch in range(epochs):
     for img, l in zip(images, labels):
         # Reshape input and labels
