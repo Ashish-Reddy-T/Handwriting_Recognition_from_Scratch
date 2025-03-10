@@ -95,6 +95,6 @@ Enter a number (0-9999) or 'q' to quit: 5
 
 ---
 
-__Enjoy real-time object detection! Contributions and feedback are welcome. 😊__
+__Enjoy real-time digit classification with this neural network! Contributions and feedback are welcome. 😊__
 
 
