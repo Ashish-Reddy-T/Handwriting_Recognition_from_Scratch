@@ -11,9 +11,11 @@ The model is trained using stochastic gradient descent with mini-batches, and th
 
 ## Project Structure
 
-- `mnist_classifier.py`: Python script implementing the neural network, training loop, and interactive prediction.
-- `MNIST dataset.npz`: Compressed NumPy file containing the MNIST dataset (`x_train`, `y_train`, `x_test`, `y_test`).
-
+```
+.
+├── mnist_classifier.py      # Python script implementing the neural network, training loop, and interactive prediction.
+└── MNIST dataset.npz        # Compressed NumPy file containing the MNIST dataset (`x_train`, `y_train`, `x_test`, `y_test`).
+```
 
 ---
 
@@ -63,4 +65,36 @@ The MNIST dataset contains 60,000 images of handwritten digits for training and 
 2. Ensure you have the necessary dependencies installed (`numpy` and `matplotlib`).
 3. Place the MNIST dataset file (`MNIST dataset.npz`) in the project directory.
 4. Run the main script:
+
+```
+python mnist_classifier.py
+```
+5. During training, the model will output the accuracy for each epoch.
+6. After training is complete, you can input a test image index (between 0-9999) to see predictions.
+
+---
+
+## Example Output
+
+```
+Epoch 1/25 - Train Acc: 92.45%
+Epoch 2/25 - Train Acc: 93.72%
+...
+Final Test Accuracy: 94.53%
+
+Enter indices 0-9999 to test predictions on test set:
+Enter a number (0-9999) or 'q' to quit: 5
+```
+
+## Hyperparameters
+
+- __Hidden Neurons__: 128
+- __Batch Size__: 128
+- __Learning Rate__: 0.01
+- __Epochs__: 25
+
+---
+
+__Enjoy real-time object detection! Contributions and feedback are welcome. 😊__
+
 
