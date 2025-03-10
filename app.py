@@ -46,7 +46,7 @@ def softmax(x):
 hidden_neurons = 128
 batch_size = 128
 learn_rate = 0.01
-epochs = 10
+epochs = 25
 
 # Improved initialization (He initialization for ReLU)
 w_i_h = np.random.randn(hidden_neurons, 784) * np.sqrt(2./784)
