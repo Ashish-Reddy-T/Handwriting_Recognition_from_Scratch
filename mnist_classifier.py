@@ -6,7 +6,7 @@ def get_mnist():
     with np.load('MNIST dataset.npz') as f:
         x_train = f["x_train"]  # Shape --> (60000, 28, 28) (60000 ---> number of images, 28*28 -> the pixel dimensions)
         y_train = f["y_train"]  # Shape --> (60000,)
-        x_test = f["x_test"]    # Shape --> (10000, 28, 28)
+        x_test = f["x_test"]    # Shape --> (10000, 28, 28)  
         y_test = f["y_test"]    # Shape --> (10000,)
     
     # Process training data
@@ -39,20 +39,20 @@ def get_mnist():
 
 # Function for introducing non-linearity
 def softmax(x):
-    exp_x = np.exp(x - np.max(x, axis = 0, keepdims=True)) # Subtract max(x) for stability
+    exp_x = np.exp(x - np.max(x, axis = 0, keepdims=True)) # Subtract max(x) before exponentiation to avoid overflow
     return exp_x / np.sum(exp_x, axis = 0, keepdims=True)
 
 # All the hyperparameteres assembled
-hidden_neurons = 128
-batch_size = 128
-learn_rate = 0.01
-epochs = 25
+hidden_neurons = 128    #  Number of neurons in the hidden layer (128)
+batch_size = 128        # Number of samples processed per training step (128)
+learn_rate = 0.01       # Step size for gradient updates (0.01)
+epochs = 25             # Number of full passes through the training data (25)
 
 # Improved initialization (He initialization for ReLU)
-w_i_h = np.random.randn(hidden_neurons, 784) * np.sqrt(2./784)
-w_h_o = np.random.randn(10, hidden_neurons) * np.sqrt(2./hidden_neurons)
-b_i_h = np.zeros((hidden_neurons, 1))
-b_h_o = np.zeros((10, 1))
+w_i_h = np.random.randn(hidden_neurons, 784) * np.sqrt(2./784)              # Scales weights by sqrt(2/number_of_inputs) to account for Relu activation variance
+w_h_o = np.random.randn(10, hidden_neurons) * np.sqrt(2./hidden_neurons)    # Same
+b_i_h = np.zeros((hidden_neurons, 1))   # Bias for the hidden layer
+b_h_o = np.zeros((10, 1))               # Bias for the output layer
 
 # Load all data
 x_train, y_train, x_test, y_test = get_mnist()
@@ -68,28 +68,28 @@ for epoch in range(epochs):
 
     for i in range(0, x_train.shape[0], batch_size):
 
-        # Get batch
+        # Get batch, transposing for converting batch matrices to shape (input_size, batch_size) for matrix multiplication
         x_batch = x_train[i:i+batch_size].T  # (784, batch_size)
         y_batch = y_train[i:i+batch_size].T  # (10, batch_size)
 
         # Forward pass
-        h_pre = w_i_h @ x_batch + b_i_h
-        h = np.maximum(0, h_pre)  # ReLU
-        o_pre = w_h_o @ h + b_h_o
-        o = softmax(o_pre)
+        h_pre = w_i_h @ x_batch + b_i_h     # Hidden layer pre-activation
+        h = np.maximum(0, h_pre)            # ReLU activation (0 if h_pre is negative for non-linearity)
+        o_pre = w_h_o @ h + b_h_o           # Output layer pre-activation
+        o = softmax(o_pre)                  # Probabilities (b/w 0 and 1)
 
         # Calculate accuracy
-        predictions = np.argmax(o, axis=0)
-        true_labels = np.argmax(y_batch, axis=0)
-        total_correct += np.sum(predictions == true_labels)
+        predictions = np.argmax(o, axis=0)                      # Index of the highest probability
+        true_labels = np.argmax(y_batch, axis=0)                # Index of the highest probability
+        total_correct += np.sum(predictions == true_labels)     # Add 1 if it's true, otherwise 0 (testing purposes)
 
          # Backward pass
-        delta_o = o - y_batch
-        delta_h = (w_h_o.T @ delta_o) * (h_pre > 0)  # ReLU derivative
+        delta_o = o - y_batch    # Output error gradient (Difference between predicted probabilities and true labels (derivative of cross-entropy loss with softmax))
+        delta_h = (w_h_o.T @ delta_o) * (h_pre > 0)  # Hidden error gradient (ReLU derivative)
 
         # Update parameters (average over batch)
-        w_h_o -= learn_rate * (delta_o @ h.T) / batch_size
-        b_h_o -= learn_rate * np.mean(delta_o, axis=1, keepdims=True)
+        w_h_o -= learn_rate * (delta_o @ h.T) / batch_size              # Adjust weights using gradients averaged over the batch
+        b_h_o -= learn_rate * np.mean(delta_o, axis=1, keepdims=True)   # Adjust biases using mean gradient across the batch
         w_i_h -= learn_rate * (delta_h @ x_batch.T) / batch_size
         b_i_h -= learn_rate * np.mean(delta_h, axis=1, keepdims=True)
 
@@ -121,7 +121,7 @@ for epoch in range(epochs):
         # # delta_h = np.transpose(w_h_o) @ delta_o * (h * (1 - h))
         # # w_i_h += -learn_rate * (delta_h @ np.transpose(img))
         # # b_i_h += -learn_rate * delta_h
-    
+
      # Calculate epoch statistics
     train_acc = total_correct / x_train.shape[0] * 100
     print(f"Epoch {epoch+1}/{epochs} - Train Acc: {train_acc:.2f}%")
@@ -129,10 +129,11 @@ for epoch in range(epochs):
     # # print(f"Epoch {epoch+1}: Accuracy = {nr_correct / len(images) * 100:.2f}%")
     # # nr_correct = 0  # Reset for next epoch  
 
-# Final test evaluation
+# Final test evaluation and accuracy for unseen data
 h_pre = w_i_h @ x_test.T + b_i_h
 h = np.maximum(0, h_pre)
-o = softmax(w_h_o @ h + b_h_o)
+o_pre = w_h_o @ h + b_h_o
+o = softmax(o_pre)
 test_acc = np.mean(np.argmax(o, axis=0) == np.argmax(y_test.T, axis=0)) * 100
 print(f"\nFinal Test Accuracy: {test_acc:.2f}%")
 
@@ -151,10 +152,13 @@ while True:
             img = x_test[index].reshape(28, 28)
             plt.imshow(img, cmap="Greys")
             
+            x = x_test[index].reshape(-1,1) # Reshape 1D array (784,) to a column vector (784,1)
+
             # Model prediction
-            h_pre = w_i_h @ x_test[index] + b_i_h
+            h_pre = w_i_h @ x + b_i_h
             h = np.maximum(0, h_pre)
-            o = softmax(w_h_o @ h + b_h_o)
+            o_pre = w_h_o @ h + b_h_o
+            o = softmax(o_pre)
             
             plt.title(f"True: {np.argmax(y_test[index])}, Pred: {np.argmax(o)}")
             plt.show()
