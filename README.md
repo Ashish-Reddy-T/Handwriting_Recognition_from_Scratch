@@ -1,11 +1,19 @@
-# MNIST Neural Network Classifier
+# MNIST Neural Network Classifier from Scratch
 
-This project implements a simple neural network to classify handwritten digits from the MNIST dataset. The neural network uses the following structure:
-- __Input layer__: 784 neurons (28x28 pixels per image flattened into a vector)
-- __Hidden layer__: 128 neurons with ReLU activation
-- __Output layer__: 10 neurons (representing digits 0 to 9) with softmax activation for classification
+This project implements a simple feedforward neural network from scratch (without using deep learning libraries like TensorFlow or PyTorch) to classify handwritten digits from the MNIST dataset. The model is trained using mini-batch gradient descent and features one hidden layer with ReLU activation and a softmax output layer.
 
-The model is trained using stochastic gradient descent with mini-batches, and the cross-entropy loss function is used for training.
+---
+
+## Features
+
+- Fully connected neural network with:
+  - __Input layer__: 784 neurons (28x28 pixels)
+  - __Hidden layer__: 128 neurons (`ReLU` activation)
+  - __Output layer__: 10 neurons (`Softmax` activation)
+- __One-hot__ encoded labels for classification
+- Mini-batch gradient descent for efficient training
+- `He` initialization for weight initialization
+- Interactive prediction on test data
 
 ---
 
@@ -13,7 +21,7 @@ The model is trained using stochastic gradient descent with mini-batches, and th
 
 ```
 .
-├── mnist_classifier.py      # Python script implementing the neural network, training loop, and interactive prediction.
+├── mnist_classifier.py      # Main python script
 └── MNIST dataset.npz        # Compressed NumPy file containing the MNIST dataset (`x_train`, `y_train`, `x_test`, `y_test`).
 ```
 
@@ -35,27 +43,11 @@ pip install numpy matplotlib
 
 ## Dataset
 
-The MNIST dataset contains 60,000 images of handwritten digits for training and 10,000 images for testing. The images are 28x28 grayscale pixels. The labels correspond to the digits (0-9) each image represents.
-
----
-
-## How It Works
-
-- __Data Loading__: The `get_mnist()` function loads the MNIST dataset from a .npz file and processes it by normalizing pixel values to the range [0, 1] and reshaping them into vectors (784,).
-- __Neural Network__:
-  - The network consists of:
-    - A __hidden layer__ with ReLU activation.
-    - An __output layer__ with softmax activation.
-  - __Forward Propagation__: The input image is passed through the network layers to compute the predicted output.
-  - __Loss Function__: The model uses cross-entropy loss for better classification performance compared to mean squared error.
-  - __Backpropagation__: The weights are updated using stochastic gradient descent with mini-batches.
-- Training:
-  - The model is trained for 25 epochs, with mini-batches of size 128.
-  - The training accuracy is printed at the end of each epoch.
-- Testing:
-  - After training, the model is evaluated on the test set to calculate its final accuracy.
-- Interactive Predictions:
-  - The user can enter an index between 0-9999 to visualize a test image and see the predicted label alongside the true label.
+The MNIST dataset should be stored in a `.npz` file named `MNIST dataset.npz`, containing:
+- `x_train`: Training images (60000, 28, 28)
+- `y_train`: Training labels (60000,)
+- `x_test`: Test images (10000, 28, 28)
+- `y_test`: Test labels (10000,)
 
 ---
 
@@ -69,29 +61,49 @@ The MNIST dataset contains 60,000 images of handwritten digits for training and 
 ```
 python mnist_classifier.py
 ```
-5. During training, the model will output the accuracy for each epoch.
-6. After training is complete, you can input a test image index (between 0-9999) to see predictions.
+
+### Interactive Prediction
+
+After training, you can test the model by entering an index (0-9999) to view the model's prediction on test images.
 
 ---
 
-## Example Output
+## Model Training
+
+The training process follows these steps:
+- __Load and preprocess the dataset__: Normalize and reshape input data, convert labels to one-hot encoding.
+- __Initialize weights and biases__: `He` initialization is used for better training stability.
+- __Training loop__:
+  - Shuffle the dataset.
+  - Perform forward propagation.
+  - Compute softmax activation and loss.
+  - Perform backpropagation to update weights and biases.
+  - Compute and display training accuracy.
+- __Final evaluation__: Compute test accuracy on unseen data.
+
+---
+
+## Example Output (cp from my own device)
 
 ```
-Epoch 1/25 - Train Acc: 92.45%
-Epoch 2/25 - Train Acc: 93.72%
+Epoch 1/25 - Train Acc: 70.45%
+Epoch 2/25 - Train Acc: 88.72%
+Epoch 3/25 - Train Acc: 89.17%
 ...
-Final Test Accuracy: 94.53%
+Epoch 25/25 - Train Acc: 95.12%
+
+Final Test Accuracy: 94.98%
 
 Enter indices 0-9999 to test predictions on test set:
 Enter a number (0-9999) or 'q' to quit: 5
 ```
 
-## Hyperparameters
+---
 
-- __Hidden Neurons__: 128
-- __Batch Size__: 128
-- __Learning Rate__: 0.01
-- __Epochs__: 25
+## Acknowledgments
+
+- Inspired by basic neural network implementations in NumPy.
+- MNIST dataset provided by Yann LeCun and colleagues.
 
 ---
 
